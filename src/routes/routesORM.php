@@ -19,6 +19,26 @@ include_once __DIR__ . '/../../src/app/models/API/AutentificadorJWT.php';
 
 return function (App $app) {
 
+	$app->group('', function () //Agrupamiento para las funciones que trabajan con JWT
+	{
+		$container = $this->getContainer();
+
+		$this->get('/usuario[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			return (new usuarioControler())->TraerTodos($request, $response, $args);
+	  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin');
+
+		$this->post('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			return (new compraControler())->CargarUno($request, $response, $args);
+	  	});
+
+		$this->get('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			return (new compraControler())->TraerTodos($request, $response, $args);
+	  	})->add(MWparaAutentificar::class . ':FiltrarCompras')->add(MWparaAutentificar::class . ':FormatearSalidaCompras');
+	})->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':GuardarLog')->add(MWparaAutentificar::class . ':VerificarUsuario');
+
 	$app->group('', function () //Agrupamiento para las funciones que NO trabajan con JWT
 	{
 		$container = $this->getContainer();
@@ -58,26 +78,6 @@ return function (App $app) {
 				return $response;
 			});*/
 	});
-
-	$app->group('', function () //Agrupamiento para las funciones que trabajan con JWT
-	{
-		$container = $this->getContainer();
-
-		$this->get('/usuario[/]', function (Request $request, Response $response, array $args) use ($container)
-		{
-			return (new usuarioControler())->TraerTodos($request, $response, $args);
-	  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin');
-
-		$this->post('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
-		{
-			return (new compraControler())->CargarUno($request, $response, $args);
-	  	});
-
-		$this->get('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
-		{
-			return (new compraControler())->TraerTodos($request, $response, $args);
-	  	})->add(MWparaAutentificar::class . ':FiltrarCompras')->add(MWparaAutentificar::class . ':FormatearSalidaCompras');
-	})->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':GuardarLog')->add(MWparaAutentificar::class . ':VerificarUsuario');
 };
 
 ?>
