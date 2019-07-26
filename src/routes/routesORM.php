@@ -74,7 +74,7 @@ return function (App $app) {
 		{
 			return (new compraControler())->TraerTodos($request, $response, $args);
 	  	})->add(MWparaAutentificar::class . ':FiltrarCompras')->add(MWparaAutentificar::class . ':FormatearSalidaCompras');
-	})->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':VerificarUsuario');
+	})->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':GuardarLog')->add(MWparaAutentificar::class . ':VerificarUsuario');
 };
 
 ?>

@@ -3,6 +3,8 @@ namespace App\Models\API;
 
 use App\Models\ORM\usuario;
 use App\Models\ORM\compra;
+use App\Models\ORM\log;
+use App\Models\ORM\logControler;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Exception;
@@ -10,6 +12,8 @@ use Exception;
 require_once "AutentificadorJWT.php";
 include_once __DIR__ . '/../ORM/usuario.php';
 include_once __DIR__ . '/../ORM/compra.php';
+include_once __DIR__ . '/../ORM/log.php';
+include_once __DIR__ . '/../ORM/logControler.php';
 
 class MWparaAutentificar
 {
@@ -199,7 +203,7 @@ class MWparaAutentificar
 		$salida = array();
 		$datos = json_decode($response->getBody(), true);
 
-		if(is_null($datos))
+		if(is_null($datos) || !$request->isGet())
 		{
 			$newResponse = $response;
 		}
@@ -224,4 +228,20 @@ class MWparaAutentificar
 
 		return $newResponse;   
 	}
+
+  	public function GuardarLog(Request $request, Response $response, callable $next)
+  	{
+  		$payload = $request->getAttribute("datosToken");
+
+  		if($payload)
+  		{
+			$requestLog = $request->withParsedBody(array(Log::getCampoUsuario() => $payload->id, Log::getCampoMetodo() => $request->getMethod(), Log::getCampoRuta() => $request->getUri()->getPath()));
+
+			$unLog = (new logControler)->CargarUno($requestLog, $response, null);
+  		}
+
+		$response = $next($request, $response);
+
+		return $response;
+  	}
 }
