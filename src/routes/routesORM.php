@@ -19,42 +19,45 @@ include_once __DIR__ . '/../../src/app/models/API/AutentificadorJWT.php';
 
 return function (App $app) {
 
-	$container = $app->getContainer();
-
-	$app->any('/usuarios[/]', function (Request $request, Response $response, array $args) use ($container)
+	$app->group('', function () //Agrupamiento para las funciones que NO trabajan con JWT
 	{
-		return (new usuarioControler())->Bienvenida($request, $response, $args);
-  	});     
+		$container = $this->getContainer();
 
-	$app->post('/usuario[/]', function (Request $request, Response $response, array $args) use ($container)
-	{
-		return (new usuarioControler())->CargarUno($request, $response, $args);
-  	})->add(function($request, $response, $next) //middleware
+		$this->any('/usuarios[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
-			$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => $request->getParsedBodyParam(Usuario::getCampoUsuario()), Usuario::getCampoClave() => $request->getParsedBodyParam(Usuario::getCampoClave()), Usuario::getCampoPerfil() => "usuario", Usuario::getCampoSexo() => $request->getParsedBodyParam(Usuario::getCampoSexo()), "id" => $request->getParsedBodyParam("id")));
+			return (new usuarioControler())->Bienvenida($request, $response, $args);
+	  	});     
 
-			$response = $next($request, $response);
-
-			return $response;
-		}
-	);     
-
-	$app->post('/login[/]', function (Request $request, Response $response, array $args) use ($container)
-	{
-		return (new usuarioControler())->Login($request, $response, $args);
-  	});     
-
-	/*$app->post('/usuario/altaAdminPorDefecto[/]', function (Request $request, Response $response, array $args) use ($container)
-	{
-		echo (new usuarioControler())->CargarUno($request, $response, $args);
-  	})->add(function($request, $response, $next) //middleware
+		$this->post('/usuario[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
-			$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => "admin", Usuario::getCampoClave() => "admin", Usuario::getCampoPerfil() => "admin", Usuario::getCampoSexo() => "femenino", "id" => "1"));
+			return (new usuarioControler())->CargarUno($request, $response, $args);
+	  	})->add(function($request, $response, $next) //middleware
+			{
+				$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => $request->getParsedBodyParam(Usuario::getCampoUsuario()), Usuario::getCampoClave() => $request->getParsedBodyParam(Usuario::getCampoClave()), Usuario::getCampoPerfil() => "usuario", Usuario::getCampoSexo() => $request->getParsedBodyParam(Usuario::getCampoSexo()), "id" => $request->getParsedBodyParam("id")));
 
-			$response = $next($request, $response);
+				$response = $next($request, $response);
 
-			return $response;
-		});*/
+				return $response;
+			}
+		);     
+
+		$this->post('/login[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			return (new usuarioControler())->Login($request, $response, $args);
+	  	});     
+
+		/*$this->post('/usuario/altaAdminPorDefecto[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			echo (new usuarioControler())->CargarUno($request, $response, $args);
+	  	})->add(function($request, $response, $next) //middleware
+			{
+				$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => "admin", Usuario::getCampoClave() => "admin", Usuario::getCampoPerfil() => "admin", Usuario::getCampoSexo() => "femenino", "id" => "1"));
+
+				$response = $next($request, $response);
+
+				return $response;
+			});*/
+	});
 
 	$app->group('', function () //Agrupamiento para las funciones que trabajan con JWT
 	{
