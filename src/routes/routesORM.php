@@ -87,7 +87,7 @@ return function (App $app) {
 		{
 			return (new compraControler())->TraerTodos($request, $response, $args);
 	  	})->add(MWparaAutentificar::class . ':FiltrarCompras');
-	})->add(MWparaAutentificar::class . ':VerificarUsuario');
+	})->add(MWparaAutentificar::class . ':FiltrarAuditoriaMasID')->add(MWparaAutentificar::class . ':FormatearSalidaCompras')->add(MWparaAutentificar::class . ':VerificarUsuario');
 };
 
 ?>

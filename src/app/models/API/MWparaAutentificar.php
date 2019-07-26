@@ -159,4 +159,56 @@ class MWparaAutentificar
 
 		return $newResponse;   
 	}
+
+	public function FormatearSalidaCompras(Request $request, Response $response, callable $next)
+	{
+		$precio = Compra::getCampoPrecio();
+		$fecha = Compra::getCampoFecha();
+		$usuario = Compra::getCampoUsuario();
+
+		$newResponse = "";
+		$response = $next($request, $response);
+
+		$compras = array();
+
+		foreach (json_decode($response->getBody(), true) as $unaCompra)
+		{
+            //Redondeo el precio a dos decimales, seteando también separador de decimales coma y separador de miles punto
+            $unaCompra[$precio] = number_format($unaCompra[$precio], 2, ",", ".");
+
+            //La fecha en el array vieen como string, para poder formatear primero tengo que convertirla a fecha con la función date_create_from_format() y luego darle el formato requerido con la función date_format()
+            $unaCompra[$fecha] = date_format(date_create_from_format("Y-m-d H:i:s", $unaCompra[$fecha]), "d/m/Y H:i:s");
+
+            //Reemplazo el id por el nombre del usuario
+            $unaCompra[$usuario] = Usuario::searchID($unaCompra[$usuario])->getUsuario();
+
+            array_push($compras, $unaCompra);
+		}
+
+		$newResponse = $response->withJson($compras, 200);
+
+		return $newResponse;   
+	}
+
+	public function FiltrarAuditoriaMasID(Request $request, Response $response, callable $next)
+	{
+		$newResponse = "";
+		$response = $next($request, $response);
+
+		$salida = array();
+
+		foreach (json_decode($response->getBody(), true) as $unDato)
+		{
+	        $func = function($key)
+	        {
+	            return ($key !== "id" && $key !== "created_at" && $key !== "updated_at");
+	        };
+
+            array_push($salida, array_filter($unDato, $func, ARRAY_FILTER_USE_KEY));
+		}
+
+		$newResponse = $response->withJson($salida, 200);
+
+		return $newResponse;   
+	}
 }
