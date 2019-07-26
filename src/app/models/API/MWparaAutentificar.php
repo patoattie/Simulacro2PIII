@@ -179,8 +179,8 @@ class MWparaAutentificar
             //La fecha en el array vieen como string, para poder formatear primero tengo que convertirla a fecha con la función date_create_from_format() y luego darle el formato requerido con la función date_format()
             $unaCompra[$fecha] = date_format(date_create_from_format("Y-m-d H:i:s", $unaCompra[$fecha]), "d/m/Y H:i:s");
 
-            //Reemplazo el id por el nombre del usuario
-            $unaCompra[$usuario] = Usuario::searchID($unaCompra[$usuario])->getUsuario();
+            //Agrego al response el nombre del usuario, utilizando el id para hacer la búsqueda en la BD.
+            $unaCompra["nombre_usuario"] = Usuario::searchID($unaCompra[$usuario])->getUsuario();
 
             array_push($compras, $unaCompra);
 		}
@@ -201,7 +201,10 @@ class MWparaAutentificar
 		{
 	        $func = function($key)
 	        {
-	            return ($key !== "id" && $key !== "created_at" && $key !== "updated_at");
+	            return ($key !== "id"
+	            	&& substr($key, 0, 3) !== "id_"
+	            	&& $key !== "created_at"
+	            	&& $key !== "updated_at");
 	        };
 
             array_push($salida, array_filter($unDato, $func, ARRAY_FILTER_USE_KEY));
