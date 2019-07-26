@@ -164,7 +164,8 @@ class MWparaAutentificar
 	{
 		$precio = Compra::getCampoPrecio();
 		$fecha = Compra::getCampoFecha();
-		$usuario = Compra::getCampoUsuario();
+		$usuarioID = Compra::getCampoUsuario();
+		$usuarioNombre = "nombre_usuario";
 
 		$newResponse = "";
 		$response = $next($request, $response);
@@ -180,7 +181,7 @@ class MWparaAutentificar
             $unaCompra[$fecha] = date_format(date_create_from_format("Y-m-d H:i:s", $unaCompra[$fecha]), "d/m/Y H:i:s");
 
             //Agrego al response el nombre del usuario, utilizando el id para hacer la búsqueda en la BD.
-            $unaCompra["nombre_usuario"] = Usuario::searchID($unaCompra[$usuario])->getUsuario();
+            $unaCompra[$usuarioNombre] = Usuario::searchID($unaCompra[$usuarioID])->getUsuario();
 
             array_push($compras, $unaCompra);
 		}

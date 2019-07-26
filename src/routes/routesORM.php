@@ -19,75 +19,62 @@ include_once __DIR__ . '/../../src/app/models/API/AutentificadorJWT.php';
 
 return function (App $app) {
 
-	$app->group('/usuarios', function ()
-	{
-		$container = $this->getContainer();
+	$container = $app->getContainer();
 
-		$this->any('[/]', function (Request $request, Response $response, array $args) use ($container)
+	$app->any('/usuarios[/]', function (Request $request, Response $response, array $args) use ($container)
+	{
+		return (new usuarioControler())->Bienvenida($request, $response, $args);
+  	});     
+
+	$app->post('/usuario[/]', function (Request $request, Response $response, array $args) use ($container)
+	{
+		return (new usuarioControler())->CargarUno($request, $response, $args);
+  	})->add(function($request, $response, $next) //middleware
 		{
-			return (new usuarioControler())->Bienvenida($request, $response, $args);
-	  	});     
-	});
+			$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => $request->getParsedBodyParam(Usuario::getCampoUsuario()), Usuario::getCampoClave() => $request->getParsedBodyParam(Usuario::getCampoClave()), Usuario::getCampoPerfil() => "usuario", Usuario::getCampoSexo() => $request->getParsedBodyParam(Usuario::getCampoSexo()), "id" => $request->getParsedBodyParam("id")));
 
-	$app->group('/usuario', function ()
+			$response = $next($request, $response);
+
+			return $response;
+		}
+	);     
+
+	$app->post('/login[/]', function (Request $request, Response $response, array $args) use ($container)
+	{
+		return (new usuarioControler())->Login($request, $response, $args);
+  	});     
+
+	/*$app->post('/usuario/altaAdminPorDefecto[/]', function (Request $request, Response $response, array $args) use ($container)
+	{
+		echo (new usuarioControler())->CargarUno($request, $response, $args);
+  	})->add(function($request, $response, $next) //middleware
+		{
+			$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => "admin", Usuario::getCampoClave() => "admin", Usuario::getCampoPerfil() => "admin", Usuario::getCampoSexo() => "femenino", "id" => "1"));
+
+			$response = $next($request, $response);
+
+			return $response;
+		});*/
+
+	$app->group('', function () //Agrupamiento para las funciones que trabajan con JWT
 	{
 		$container = $this->getContainer();
 
-		$this->get('[/]', function (Request $request, Response $response, array $args) use ($container)
+		$this->get('/usuario[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
 			return (new usuarioControler())->TraerTodos($request, $response, $args);
-	  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin')->add(MWparaAutentificar::class . ':VerificarUsuario');
+	  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin');
 
-		$this->post('[/]', function (Request $request, Response $response, array $args) use ($container)
-		{
-			return (new usuarioControler())->CargarUno($request, $response, $args);
-	  	})->add(function($request, $response, $next) //middleware
-			{
-				$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => $request->getParsedBodyParam(Usuario::getCampoUsuario()), Usuario::getCampoClave() => $request->getParsedBodyParam(Usuario::getCampoClave()), Usuario::getCampoPerfil() => "usuario", Usuario::getCampoSexo() => $request->getParsedBodyParam(Usuario::getCampoSexo()), "id" => $request->getParsedBodyParam("id")));
-
-				$response = $next($request, $response);
-
-				return $response;
-			}
-		);     
-
-		/*$this->post('/altaAdminPorDefecto[/]', function (Request $request, Response $response, array $args) use ($container)
-		{
-			echo (new usuarioControler())->CargarUno($request, $response, $args);
-	  	})->add(function($request, $response, $next) //middleware
-			{
-				$request = $request->withParsedBody(array(Usuario::getCampoUsuario() => "admin", Usuario::getCampoClave() => "admin", Usuario::getCampoPerfil() => "admin", Usuario::getCampoSexo() => "femenino", "id" => "1"));
-
-				$response = $next($request, $response);
-
-				return $response;
-			});*/
-	});
-
-	$app->group('/login', function ()
-	{
-		$container = $this->getContainer();
-
-		$this->post('[/]', function (Request $request, Response $response, array $args) use ($container)
-		{
-			return (new usuarioControler())->Login($request, $response, $args);
-	  	});     
-	});
-
-	$app->group('/compra', function ()
-	{
-		$container = $this->getContainer();
-
-		$this->post('[/]', function (Request $request, Response $response, array $args) use ($container)
+		$this->post('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
 			return (new compraControler())->CargarUno($request, $response, $args);
 	  	});
 
-		$this->get('[/]', function (Request $request, Response $response, array $args) use ($container)
+		$this->get('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
 			return (new compraControler())->TraerTodos($request, $response, $args);
-	  	})->add(MWparaAutentificar::class . ':FiltrarCompras');
-	})->add(MWparaAutentificar::class . ':FormatearSalidaCompras')->add(MWparaAutentificar::class . ':FiltrarAuditoriaMasID')->add(MWparaAutentificar::class . ':VerificarUsuario');
+	  	})->add(MWparaAutentificar::class . ':FiltrarCompras')->add(MWparaAutentificar::class . ':FormatearSalidaCompras');
+	})->add(MWparaAutentificar::class . ':FiltrarAuditoriaMasID')->add(MWparaAutentificar::class . ':VerificarUsuario');
 };
 
 ?>
