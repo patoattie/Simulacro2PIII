@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 class LogControler implements IApiControler 
 {
  	public function Bienvenida($request, $response, $args) {
-		return $response->getBody()->write("<h1>" . $request->getMethod() . " => Simulacro 2do Parcial</h1>
+        return $response->getBody()->write("<h1>" . $request->getMethod() . " => Simulacro 2do Parcial</h1>
             <h2>ETAPA 1</h2>
                 <ol>
                     <li>Ruta “usuario”(POST) , alta de usuario(nombre , clave y sexo).<br>
@@ -36,6 +36,19 @@ class LogControler implements IApiControler
                     <li>Modificar la ruta “Compra”(POST), y subir una imagen que se guarde en la carpeta “IMGCompras” con el
                     nombre del id de la compra y el artículo.</li>
                     <li>Ruta “Compra”(GET),retorna el listado de compras del usuario pero si es un admin, retorna todas compras.</li>
+                    <h2><li>( nota 4)El enunciado será dado el dia del examen.</li></h2>
+                    <h2>Atención !!!: si y solo si , hacen el punto 9, y después de hacerlo se corrige los siguientes puntos</h2>
+                    <h2>...</h2>
+                    <li>(nota 5)Cambios :<br>
+                    a-(GET)Listado de compras con fotos.<br>
+                    b-(POST)Alta de foto con marca de agua.</li>
+                    <li>(nota 6)(PUT)Modificar los datos de un usuario, cambiando el sexo y el password.</li>
+                    <li>(nota 7)(GET)Mostrar los datos recopilados en el punto 6 filtrados por el método utilizado.</li>
+                    <li>(nota 8)(DELETE)Borrar una compra.</li>
+                    <li>(nota 9)(GET) mostrar las ventas filtradas por el nombre del usuario.</li>
+                    <li>(nota 10)(GET)<br>
+                    a-agregar el campo tipo de pago a la compra(efectivo,tarjeta o mercadopago)<br>
+                    b-mostrar las ventas filtradas por un parámetro llamado filtro, que puede ser el nombre del usuario, el nombre del artículo o el tipo de pago,traer todos los datos que coincidan con el dato en cualquiera de los criterios de búsqueda.</li>
                 </ol>");
     }
     
