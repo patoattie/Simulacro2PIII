@@ -191,27 +191,36 @@ class MWparaAutentificar
 		return $newResponse;   
 	}
 
-	public function FiltrarAuditoriaMasID(Request $request, Response $response, callable $next)
+	public function FiltrarCamposReservados(Request $request, Response $response, callable $next)
 	{
 		$newResponse = "";
 		$response = $next($request, $response);
 
 		$salida = array();
+		$datos = json_decode($response->getBody(), true);
 
-		foreach (json_decode($response->getBody(), true) as $unDato)
+		if(is_null($datos))
 		{
-	        $func = function($key)
-	        {
-	            return ($key !== "id"
-	            	&& substr($key, 0, 3) !== "id_"
-	            	&& $key !== "created_at"
-	            	&& $key !== "updated_at");
-	        };
-
-            array_push($salida, array_filter($unDato, $func, ARRAY_FILTER_USE_KEY));
+			$newResponse = $response;
 		}
+		else
+		{
+			foreach ($datos as $unDato)
+			{
+		        $func = function($key)
+		        {
+		            return ($key !== "id"
+		            	&& substr($key, 0, 3) !== "id_"
+		            	&& $key !== Usuario::getCampoClave()
+		            	&& $key !== "created_at"
+		            	&& $key !== "updated_at");
+		        };
 
-		$newResponse = $response->withJson($salida, 200);
+	            array_push($salida, array_filter($unDato, $func, ARRAY_FILTER_USE_KEY));
+			}
+	
+			$newResponse = $response->withJson($salida, 200);
+		}
 
 		return $newResponse;   
 	}
