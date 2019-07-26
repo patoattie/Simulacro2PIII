@@ -28,6 +28,11 @@ return function (App $app) {
 			return (new usuarioControler())->TraerTodos($request, $response, $args);
 	  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin');
 
+		$this->post('/usuarioNuevo[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			return (new usuarioControler())->CargarUno($request, $response, $args);
+	  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin');     
+
 		$this->post('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
 			return (new compraControler())->CargarUno($request, $response, $args);
