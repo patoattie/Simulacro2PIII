@@ -3,9 +3,11 @@ namespace App\Models\ORM;
 
 use App\Models\ORM\compra;
 use App\Models\API\IApiControler;
+use App\Models\API\ManejadorArchivos;
 
 require_once __DIR__ . '/compra.php';
 include_once __DIR__ . '../../API/IApiControler.php';
+include_once __DIR__ . '../../API/ManejadorArchivos.php';
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -64,7 +66,8 @@ class CompraControler implements IApiControler
      	 //complete el codigo
 
         $condicion = self::cargarConBody($request);
-
+        //$foto = $request->getUploadedFiles()["foto"];
+var_dump($request->getUploadedFiles());
         //cargo un objeto de tipo Compra con los parametros ingresados por POST
         $unaCompra = new Compra();
 
@@ -79,7 +82,11 @@ class CompraControler implements IApiControler
         if($unaCompra->calculaID()) //El ID es autoincremental, lo dejo en nulo para que lo calcule la BD.
         {
             $unaCompra->setID(null);
-            $unaCompra->save();
+
+            if($unaCompra->save() && $foto != null)
+            {
+                ManejadorArchivos::cargarImagenPorNombre($foto, $unaCompra[$unaCompra->getCampoID()] . "_" . $unaCompra[$unaCompra->getCampoArticulo()], "./IMGCompras");
+            }
         }
         else
         {
