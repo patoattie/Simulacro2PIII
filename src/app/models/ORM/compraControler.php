@@ -11,7 +11,7 @@ include_once __DIR__ . '../../API/ManejadorArchivos.php';
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
+use Slim\Http\UploadedFile;
 
 class CompraControler implements IApiControler 
 {
@@ -66,8 +66,9 @@ class CompraControler implements IApiControler
      	 //complete el codigo
 
         $condicion = self::cargarConBody($request);
-        //$foto = $request->getUploadedFiles()["foto"];
-var_dump($request->getUploadedFiles());
+        $archivos = $request->getUploadedFiles();
+        $foto = $archivos["foto"];
+
         //cargo un objeto de tipo Compra con los parametros ingresados por POST
         $unaCompra = new Compra();
 
@@ -83,9 +84,12 @@ var_dump($request->getUploadedFiles());
         {
             $unaCompra->setID(null);
 
-            if($unaCompra->save() && $foto != null)
+            if($unaCompra->save())
             {
-                ManejadorArchivos::cargarImagenPorNombre($foto, $unaCompra[$unaCompra->getCampoID()] . "_" . $unaCompra[$unaCompra->getCampoArticulo()], "./IMGCompras");
+                if ($foto->getError() === UPLOAD_ERR_OK)
+                {
+                    ManejadorArchivos::cargarImagenPorNombre($foto, $unaCompra[$unaCompra->getCampoID()] . "_" . $unaCompra[$unaCompra->getCampoArticulo()], "./IMGCompras/");
+                }
             }
         }
         else

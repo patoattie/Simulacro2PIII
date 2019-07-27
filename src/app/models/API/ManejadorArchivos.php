@@ -11,7 +11,8 @@ class ManejadorArchivos
 	public function cargarImagenPorNombre($nombreArchivo, $nombre, $carpetaDestino )
 	{
 		//INDICO CUAL SERA EL DESTINO DEL ARCHIVO SUBIDO
-		$destino = $carpetaDestino . $nombreArchivo["name"];
+		//$destino = $carpetaDestino . $nombreArchivo["name"];
+		$destino = $carpetaDestino . $nombreArchivo->getClientFilename();
 		if (isset($nombre)) {
 			$tipoArchivo = pathinfo($destino, PATHINFO_EXTENSION);
 			$destino = $carpetaDestino . $nombre . ".$tipoArchivo";
@@ -27,10 +28,10 @@ class ManejadorArchivos
 		$tipoArchivo = pathinfo($destino, PATHINFO_EXTENSION);
 		//VERIFICO QUE EL ARCHIVO NO EXISTA
 		if (file_exists($destino)) {
-			$uploadOk = ManejadorArchivo::moverArchivoBackup($nombreArchivo["name"], $nombre, $destino);
+			$uploadOk = ManejadorArchivo::moverArchivoBackup($nombreArchivo->getClientFilename(), $nombre, $destino);
 		}
-		//VERIFICO EL TAMA�O MAXIMO QUE PERMITO SUBIR
-		if ($nombreArchivo["size"] > 5000000) {
+		//VERIFICO EL TAMAÑO MAXIMO QUE PERMITO SUBIR
+		if ($nombreArchivo->getSize() > 5000000) {
 			echo "El archivo es demasiado grande. Verifique!!!";
 			$uploadOk = FALSE;
 		}
@@ -38,7 +39,7 @@ class ManejadorArchivos
 		//var_dump(getimagesize($_FILES["archivo"]["tmp_name"]));die();
 		//OBTIENE EL TAMA�O DE UNA IMAGEN, SI EL ARCHIVO NO ES UNA
 		//IMAGEN, RETORNA FALSE
-		$esImagen = getimagesize($nombreArchivo["tmp_name"]);
+		/*$esImagen = getimagesize($nombreArchivo["tmp_name"]);
 		if ($esImagen === FALSE) { //NO ES UNA IMAGEN
 			//SOLO PERMITO CIERTAS EXTENSIONES
 			if ($tipoArchivo != "doc" && $tipoArchivo != "txt" && $tipoArchivo != "rar") {
@@ -54,18 +55,20 @@ class ManejadorArchivos
 				echo "Solo son permitidas imagenes con extension JPG, JPEG, PNG o GIF.";
 				$uploadOk = FALSE;
 			}
-		}
+		}*/
 		//VERIFICO SI HUBO ALGUN ERROR, CHEQUEANDO $uploadOk
 		if ($uploadOk === FALSE) {
 			echo "<br/>NO SE PUDO SUBIR EL ARCHIVO.";
 		} else {
 			//MUEVO EL ARCHIVO DEL TEMPORAL AL DESTINO FINAL
-			if (move_uploaded_file($nombreArchivo["tmp_name"], $destino))
-			{
+			//if (move_uploaded_file($nombreArchivo["tmp_name"], $destino))
+			if (!$nombreArchivo->moveTo($destino))
+			/*{
 				//MarcadeAgua::hacerMarca($destino, "./firma.png");
 				echo "<br/><h1>El archivo " . $nombreArchivo["name"] . " ha sido subido exitosamente.</h1>";
 			} 
-			else {
+			else*/
+			{
 				echo "<br/>Lamentablemente ocurrio; un error y no se pudo subir el archivo.";
 			}
 		}
