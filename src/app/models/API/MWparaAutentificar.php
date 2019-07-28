@@ -195,6 +195,44 @@ class MWparaAutentificar
 		return $newResponse;   
 	}
 
+	public function FormatearSalidaComprasHTML(Request $request, Response $response, callable $next)
+	{
+		$response = $next($request, $response);
+
+		$compras = json_decode($response->getBody(), true);
+
+		$salida = "<table>";
+		$salida = $salida . "<caption>Compras</caption>";
+		$salida = $salida . "<tr>";
+
+		foreach (array_keys($compras[0]) as $unaClave)
+		{
+			$salida = $salida . "<th>$unaClave</th>";
+		}
+
+		$salida = $salida . "</tr>";
+
+		foreach ($compras as $unaCompra)
+		{
+			$salida = $salida . "<tr>";
+	
+			foreach ($unaCompra as $valor)
+			{
+				$salida = $salida . "<td>$valor</td>";
+			}
+
+			$salida = $salida . "</tr>";
+		}
+
+		$salida = $salida . "</table>";
+
+		//echo $salida;
+
+		$newResponse = $response->withJson($salida, 200, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES);
+
+		return $newResponse;   
+	}
+
 	public function FiltrarCamposReservados(Request $request, Response $response, callable $next)
 	{
 		$newResponse = "";
