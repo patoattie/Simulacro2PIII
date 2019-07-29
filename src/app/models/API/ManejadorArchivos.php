@@ -10,7 +10,7 @@ class ManejadorArchivos
 		$archivoDestino = pathinfo($archivoOrigen, PATHINFO_DIRNAME) . "/" . $nombreNuevo . "." . pathinfo($archivoOrigen, PATHINFO_EXTENSION);
 		return $archivoDestino;
 	}*/
-	public function cargarImagenPorNombre($nombreArchivo, $nombre, $carpetaDestino )
+	public function cargarImagenPorNombre($nombreArchivo, $nombre, $carpetaDestino, $marcaDeAgua = NULL)
 	{
 		//INDICO CUAL SERA EL DESTINO DEL ARCHIVO SUBIDO
 		$destino = $carpetaDestino . $nombreArchivo->getClientFilename();
@@ -77,6 +77,11 @@ class ManejadorArchivos
 			{
 				$nombreArchivo->moveTo($destino);
 				//MarcadeAgua::hacerMarca($destino, "./firma.png");
+				
+				if($marcaDeAgua != NULL)
+				{
+					self::addTextWatermark($destino, $marcaDeAgua, $destino);
+				}
 			}
 			catch(Exception $e)
 			{
@@ -89,6 +94,7 @@ class ManejadorArchivos
 	{
 		copy($archivo, "backup/" . pathinfo($archivo, PATHINFO_FILENAME) . "_" . date("YmdHis") . "." . pathinfo($archivo, PATHINFO_EXTENSION));
 	}
+
 	public static function agregarMarcaAgua($archivo, $marca)
 	{
 		$im = imagecreatefrompng($archivo);
@@ -105,6 +111,31 @@ class ManejadorArchivos
 		header('Content-type: image/png');
 		imagepng($im, $archivo);
 		imagedestroy($im);
+	}
+
+	public static function addTextWatermark($src, $watermark, $save = NULL)
+	{
+		list($width, $height) = getimagesize($src);
+		$image_color = imagecreatetruecolor($width, $height);
+		$image = imagecreatefrompng($src);
+		imagecopyresampled($image_color, $image, 0, 0, 0, 0, $width, $height, $width, $height);
+		$txtcolor = imagecolorallocate($image_color, 255, 255, 255);
+		$font = __DIR__ . '/../../../../fuentes/UbuntuMono-Regular.ttf';
+		$font_size = 24;
+		imagettftext($image_color, $font_size, 0, 50, 150, $txtcolor, $font, $watermark);
+
+		if ($save != NULL)
+		{
+			imagepng ($image_color, $save, 0);
+		}
+		else
+		{
+			header('Content-Type: image/png');
+			imagepng($image_color, null, 0);
+		}
+
+		imagedestroy($image);
+		imagedestroy($image_color);
 	}
 }
 ?>

@@ -205,7 +205,7 @@ class MWparaAutentificar
 		$salida = $salida . "<caption>Compras</caption>";
 		$salida = $salida . "<tr>";
 		
-		$salida = $salida . "<th>Imagen</th>";
+		$salida = $salida . "<th>imagen</th>";
 
 		foreach (array_keys($compras[0]) as $unaClave)
 		{

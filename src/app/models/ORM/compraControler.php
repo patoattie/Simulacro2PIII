@@ -88,7 +88,8 @@ class CompraControler implements IApiControler
             {
                 if ($foto->getError() === UPLOAD_ERR_OK)
                 {
-                    ManejadorArchivos::cargarImagenPorNombre($foto, $unaCompra[$unaCompra->getCampoID()] . "_" . $unaCompra[$unaCompra->getCampoArticulo()], __DIR__ . "/../../../../IMGCompras/");
+                    $nombreFoto = $unaCompra[$unaCompra->getCampoID()] . "_" . $unaCompra[$unaCompra->getCampoArticulo()];
+                    ManejadorArchivos::cargarImagenPorNombre($foto, $nombreFoto, __DIR__ . "/../../../../IMGCompras/", $nombreFoto);
                 }
             }
         }
