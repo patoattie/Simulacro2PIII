@@ -204,6 +204,8 @@ class MWparaAutentificar
 		$salida = "<table>";
 		$salida = $salida . "<caption>Compras</caption>";
 		$salida = $salida . "<tr>";
+		
+		$salida = $salida . "<th>Imagen</th>";
 
 		foreach (array_keys($compras[0]) as $unaClave)
 		{
@@ -215,6 +217,16 @@ class MWparaAutentificar
 		foreach ($compras as $unaCompra)
 		{
 			$salida = $salida . "<tr>";
+			$imagen = __DIR__ . "/../../../../IMGCompras/" . $unaCompra["id"] . "_" . $unaCompra[Compra::getCampoArticulo()] . ".png";
+
+			if(file_exists($imagen))
+			{
+				$salida = $salida . "<td><img src = $imagen alt = $imagen style = 'width:48px; height:48px;>'</td>";
+			}
+			else
+			{
+				$salida = $salida . "<td></td>";
+			}
 	
 			foreach ($unaCompra as $valor)
 			{
