@@ -97,6 +97,11 @@ class Compra extends \Illuminate\Database\Eloquent\Model
 	{
 		return "precio";
 	}
+
+	public static function searchUsuario($usuario)
+	{
+		return (new Compra())->where(array(self::getCampoUsuario() => $usuario))->get();
+	}
 }
 
 ?>

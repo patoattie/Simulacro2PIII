@@ -51,6 +51,11 @@ return function (App $app) {
 		{
 			return (new compraControler())->TraerTodos($request, $response, $args);
 	  	})->add(MWparaAutentificar::class . ':FiltrarCompras')->add(MWparaAutentificar::class . ':FormatearSalidaCompras');
+
+		$this->delete('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			return (new compraControler())->BorrarUno($request, $response, $args);
+	  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin');
 	})->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':GuardarLog')->add(MWparaAutentificar::class . ':VerificarUsuario');
 
 	$app->group('', function () //Agrupamiento para las funciones que NO trabajan con JWT

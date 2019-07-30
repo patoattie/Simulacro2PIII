@@ -2,10 +2,12 @@
 namespace App\Models\ORM;
 
 use App\Models\ORM\compra;
+use App\Models\ORM\usuario;
 use App\Models\API\IApiControler;
 use App\Models\API\ManejadorArchivos;
 
 require_once __DIR__ . '/compra.php';
+require_once __DIR__ . '/usuario.php';
 include_once __DIR__ . '../../API/IApiControler.php';
 include_once __DIR__ . '../../API/ManejadorArchivos.php';
 
@@ -130,7 +132,62 @@ class CompraControler implements IApiControler
 
     public function BorrarUno($request, $response, $args)
     {
+        //modifico en la base
+        $estado = 0; //OK
 
+        $condicion = self::cargarConBody($request);
+
+        $tengoArticulo = array_key_exists(Compra::getCampoArticulo(), $condicion);
+        $tengoFecha = array_key_exists(Compra::getCampoFecha(), $condicion);
+        $tengoPrecio = array_key_exists(Compra::getCampoPrecio(), $condicion);
+        $tengoUsuario = array_key_exists('usuario', $condicion);
+
+        if(!$tengoArticulo || !$tengoFecha || !$tengoPrecio || !$tengoUsuario)
+        {
+            $estado = -3; //"No tengo la clave completa para borrar una compra"
+        }
+        else
+        {
+            $usuario = Usuario::searchUsuario($condicion["usuario"]);
+
+            if($usuario)
+            {
+                //cargo un array de objetos de tipo Compra que satisfagan el id_usuario requerido
+                $compras = Compra::searchUsuario($usuario->id);
+
+                if($compras)
+                {
+                    foreach ($compras as $unaCompra)
+                    {
+                        if($unaCompra[Compra::getCampoArticulo()] == $condicion[Compra::getCampoArticulo()]
+                        && $unaCompra[Compra::getCampoPrecio()] == $condicion[Compra::getCampoPrecio()]
+                        && $unaCompra[Compra::getCampoFecha()] == $condicion[Compra::getCampoFecha()])
+                        {
+                            //Si existe, borro la compra de la BD
+                            $borro = $unaCompra->delete();
+                            if(!$borro || is_null($borro))
+                            {
+                                $estado = -2; //"Error al borrar en la BD"
+                            }
+
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    $estado = -1; //"La Compra no existe"
+                }
+            }
+            else
+            {
+                $estado = -4; //"El usuario no existe"
+            }
+        }
+
+        //Devuelvo el estado
+        $newResponse = $response->withJson($estado, 200);  
+        return $newResponse;
     }
 
     public function ModificarUno($request, $response, $args)
@@ -158,10 +215,7 @@ class CompraControler implements IApiControler
         //recorro los parámetros ingresados
         foreach ($request->getParsedBody() as $key => $value) //Parametros de $_POST
         {
-            if($key !== "usuario")
-            {
-                $parametros[$key] = $value;
-            }
+            $parametros[$key] = $value;
         }
 
         return $parametros;
