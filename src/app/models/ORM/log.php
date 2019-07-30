@@ -97,6 +97,13 @@ class Log extends \Illuminate\Database\Eloquent\Model
 	{
 		return "ruta";
 	}
+
+	public static function searchMetodo($metodo)
+	{
+		$unLog = new Log();
+
+		return $unLog->where(array(self::getCampoMetodo() => $metodo))->get();
+	}
 }
 
 ?>

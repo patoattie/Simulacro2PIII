@@ -7,6 +7,8 @@ use App\Models\ORM\usuario;
 use App\Models\ORM\usuarioControler;
 use App\Models\ORM\compra;
 use App\Models\ORM\compraControler;
+use App\Models\ORM\log;
+use App\Models\ORM\logControler;
 use App\Models\API\MWparaAutentificar;
 use App\Models\API\AutentificadorJWT;
 
@@ -14,6 +16,8 @@ include_once __DIR__ . '/../../src/app/models/ORM/usuario.php';
 include_once __DIR__ . '/../../src/app/models/ORM/usuarioControler.php';
 include_once __DIR__ . '/../../src/app/models/ORM/compra.php';
 include_once __DIR__ . '/../../src/app/models/ORM/compraControler.php';
+include_once __DIR__ . '/../../src/app/models/ORM/log.php';
+include_once __DIR__ . '/../../src/app/models/ORM/logControler.php';
 include_once __DIR__ . '/../../src/app/models/API/MWparaAutentificar.php';
 include_once __DIR__ . '/../../src/app/models/API/AutentificadorJWT.php';
 
@@ -95,6 +99,11 @@ return function (App $app) {
 	{
 		return (new compraControler())->TraerTodos($request, $response, $args);
   	})->add(MWparaAutentificar::class . ':FiltrarCompras')->add(MWparaAutentificar::class . ':FormatearSalidaCompras')->add(MWparaAutentificar::class . ':GuardarLog')->add(MWparaAutentificar::class . ':FormatearSalidaComprasHTML')->add(MWparaAutentificar::class . ':VerificarUsuario');
+
+	$app->get('/logs[/{metodo}]', function (Request $request, Response $response, array $args) use ($container)
+	{
+		return (new logControler())->TraerUno($request, $response, $args);
+  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin')->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':VerificarUsuario');
 
 };
 

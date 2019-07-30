@@ -113,7 +113,24 @@ class LogControler implements IApiControler
 
     public function TraerUno($request, $response, $args)
     {
+        $filtroMetodo = isset($args[0]);
 
+        $logs = "";
+
+        if($filtroMetodo)
+        {
+            //retorna un array de objetos de tipo log con todos los logs de la colección que satisfacen eñ filtro por método
+            $logs = Log::searchMetodo($args);
+        }
+        else
+        {
+            //retorna un array de objetos de tipo log con todos los logs de la colección
+            $logs = Log::all();
+        }
+
+        //Devuelvo el estado
+        $newResponse = $response->withJson($logs, 200);  
+        return $newResponse;
     }
 
     public function BorrarUno($request, $response, $args)
