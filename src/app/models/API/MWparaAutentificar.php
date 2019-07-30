@@ -218,10 +218,11 @@ class MWparaAutentificar
 		{
 			$salida = $salida . "<tr>";
 			$imagen = __DIR__ . "/../../../../IMGCompras/" . $unaCompra["id"] . "_" . $unaCompra[Compra::getCampoArticulo()] . ".png";
+			$imagenURL = "http://localhost/Simulacro2P/IMGCompras/" . $unaCompra["id"] . "_" . $unaCompra[Compra::getCampoArticulo()] . ".png";
 
 			if(file_exists($imagen))
 			{
-				$salida = $salida . "<td><img src = $imagen alt = $imagen style = 'width:48px; height:48px;>'</td>";
+				$salida = $salida . "<td><img src = $imagenURL alt = $imagenURL style = 'width:48px; height:48px;>'</td>";
 			}
 			else
 			{
