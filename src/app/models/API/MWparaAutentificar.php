@@ -274,7 +274,7 @@ class MWparaAutentificar
 	            array_push($salida, array_filter($unDato, $func, ARRAY_FILTER_USE_KEY));
 			}
 	
-			$newResponse = $response->withJson($salida, 200);
+			$newResponse = $response->withJson($salida, 200, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES);
 		}
 
 		return $newResponse;   
@@ -295,4 +295,31 @@ class MWparaAutentificar
 
 		return $response;
   	}
+
+	public function FormatearSalidaLogs(Request $request, Response $response, callable $next)
+	{
+		$fecha = Log::getCampoFecha();
+		$usuarioID = Log::getCampoUsuario();
+		$usuarioNombre = "nombre_usuario";
+
+		$newResponse = "";
+		$response = $next($request, $response);
+
+		$logs = array();
+
+		foreach (json_decode($response->getBody(), true) as $unLog)
+		{
+            //La fecha en el array vieen como string, para poder formatear primero tengo que convertirla a fecha con la función date_create_from_format() y luego darle el formato requerido con la función date_format()
+            $unLog[$fecha] = date_format(date_create_from_format("Y-m-d H:i:s", $unLog[$fecha]), "d/m/Y H:i:s");
+
+            //Agrego al response el nombre del usuario, utilizando el id para hacer la búsqueda en la BD.
+            $unLog[$usuarioNombre] = Usuario::searchID($unLog[$usuarioID])->getUsuario();
+
+            array_push($logs, $unLog);
+		}
+
+		$newResponse = $response->withJson($logs, 200, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES);
+
+		return $newResponse;   
+	}
 }

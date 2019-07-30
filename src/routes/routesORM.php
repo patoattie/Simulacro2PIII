@@ -103,7 +103,7 @@ return function (App $app) {
 	$app->get('/logs[/{metodo}]', function (Request $request, Response $response, array $args) use ($container)
 	{
 		return (new logControler())->TraerUno($request, $response, $args);
-  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin')->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':VerificarUsuario');
+  	})->add(MWparaAutentificar::class . ':ExclusivoAdmin')->add(MWparaAutentificar::class . ':FormatearSalidaLogs')->add(MWparaAutentificar::class . ':FiltrarCamposReservados')->add(MWparaAutentificar::class . ':VerificarUsuario');
 
 };
 
