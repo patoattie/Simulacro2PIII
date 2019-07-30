@@ -71,11 +71,6 @@ return function (App $app) {
 			return (new usuarioControler())->Login($request, $response, $args);
 	  	});     
 
-		$this->get('/listaCompras[/]', function (Request $request, Response $response, array $args) use ($container)
-		{
-			return (new compraControler())->TraerTodos($request, $response, $args);
-	  	})->add(MWparaAutentificar::class . ':FormatearSalidaCompras')->add(MWparaAutentificar::class . ':FormatearSalidaComprasHTML');
-
 		/*$this->post('/usuario/altaAdminPorDefecto[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
 			echo (new usuarioControler())->CargarUno($request, $response, $args);
@@ -88,6 +83,14 @@ return function (App $app) {
 				return $response;
 			});*/
 	});
+
+	$container = $app->getContainer();
+
+	$app->get('/listaCompras[/]', function (Request $request, Response $response, array $args) use ($container)
+	{
+		return (new compraControler())->TraerTodos($request, $response, $args);
+  	})->add(MWparaAutentificar::class . ':FiltrarCompras')->add(MWparaAutentificar::class . ':FormatearSalidaCompras')->add(MWparaAutentificar::class . ':GuardarLog')->add(MWparaAutentificar::class . ':FormatearSalidaComprasHTML')->add(MWparaAutentificar::class . ':VerificarUsuario');
+
 };
 
 ?>

@@ -119,7 +119,7 @@ class ManejadorArchivos
 		$image_color = imagecreatetruecolor($width, $height);
 		$image = imagecreatefrompng($src);
 		imagecopyresampled($image_color, $image, 0, 0, 0, 0, $width, $height, $width, $height);
-		$txtcolor = imagecolorallocate($image_color, 255, 255, 255);
+		$txtcolor = imagecolorallocate($image_color, 255, 0, 0);
 		$font = __DIR__ . '/../../../../fuentes/UbuntuMono-Regular.ttf';
 		$font_size = 24;
 		imagettftext($image_color, $font_size, 0, 50, 150, $txtcolor, $font, $watermark);
