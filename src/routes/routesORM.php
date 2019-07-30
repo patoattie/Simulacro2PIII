@@ -38,6 +38,11 @@ return function (App $app) {
 			return (new compraControler())->CargarUno($request, $response, $args);
 	  	});
 
+		$this->put('/usuario[/]', function (Request $request, Response $response, array $args) use ($container)
+		{
+			return (new usuarioControler())->ModificarUno($request, $response, $args);
+	  	});
+
 		$this->get('/compra[/]', function (Request $request, Response $response, array $args) use ($container)
 		{
 			return (new compraControler())->TraerTodos($request, $response, $args);

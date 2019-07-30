@@ -166,17 +166,7 @@ class UsuarioControler implements IApiControler
             }
             else
             {
-                //Guardo en el JWT únicamente los campos id, nombre, perfil, y sexo
-                $func = function($key)
-                {
-                    return ($key === "id"
-                     || $key === Usuario::getCampoUsuario()
-                     || $key === Usuario::getCampoPerfil()
-                     || $key === Usuario::getCampoSexo());
-                };
-
-                $newResponse = $response->withJson(
-                    AutentificadorJWT::CrearToken(array_filter($unUsuario->toArray(), $func, ARRAY_FILTER_USE_KEY), 200));
+                $newResponse = $response->withJson(self::crearToken($unUsuario), 200);
             }
         }
 
@@ -190,7 +180,54 @@ class UsuarioControler implements IApiControler
 
     public function ModificarUno($request, $response, $args)
     {
+        //modifico en la base
+        $estado = 0; //OK
+        $nuevoToken = "";
 
+        $condicion = self::cargarConBody($request);
+
+        $cambioClave = array_key_exists(Usuario::getCampoClave(), $condicion);
+        $cambioSexo = array_key_exists(Usuario::getCampoSexo(), $condicion);
+
+        if(!$cambioClave && !$cambioSexo)
+        {
+            $estado = -2; //"No modifica ninguno de los atributos permitidos"
+        }
+        else
+        {
+            //cargo los atributos a ingresar en el objeto
+            $payload = $request->getAttribute("datosToken");
+
+            //cargo un objeto de tipo usuario con el ID del JWT
+            $unUsuario = Usuario::searchID($payload->id);
+
+            if(!$unUsuario) //Si NO existe el ID, muestro mensaje al usuario y no modifico nada
+            {
+                $estado = -1; //"El usuario no existe"
+            }
+            else
+            {
+                //cargo los atributos a modificar en el objeto
+                if($cambioClave)
+                {
+                    $unUsuario->setClave($condicion[Usuario::getCampoClave()]);
+                }
+                if($cambioSexo)
+                {
+                    $unUsuario->setSexo($condicion[Usuario::getCampoSexo()]);
+                }
+
+                //guardo los cambios en la BD y retorno el nuevo JWT
+                if($unUsuario->save())
+                {
+                    $nuevoToken = self::crearToken($unUsuario);
+                }
+            }
+        }
+
+        //Devuelvo el estado
+        $newResponse = $response->withJson($estado . ";" . $nuevoToken, 200);  
+        return $newResponse;
     }
 
     private static function cargarConQueryParams($request)
@@ -218,6 +255,20 @@ class UsuarioControler implements IApiControler
 
         return $parametros;
     }
+
+    private static function crearToken($usuario)
+    {
+        //Guardo en el JWT únicamente los campos id, nombre, perfil, y sexo
+        $func = function($key)
+        {
+            return ($key === "id"
+             || $key === Usuario::getCampoUsuario()
+             || $key === Usuario::getCampoPerfil()
+             || $key === Usuario::getCampoSexo());
+        };
+
+        return AutentificadorJWT::CrearToken(array_filter($usuario->toArray(), $func, ARRAY_FILTER_USE_KEY));
+   }
 }
 
 ?>

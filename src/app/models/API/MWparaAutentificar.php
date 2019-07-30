@@ -63,7 +63,7 @@ class MWparaAutentificar
 			{						
 				$payload = AutentificadorJWT::ObtenerData($token);
 
-				if(!$request->isPost() && !$request->isGet()) // el post y el get sirven para todos los logueados
+				/*if(!$request->isPost() && !$request->isGet()) // el post y el get sirven para todos los logueados
 				{
 		  			$perfil = Usuario::getCampoPerfil();
 
@@ -73,7 +73,7 @@ class MWparaAutentificar
 						$objDelaRespuesta->esValido = false;
 						$objDelaRespuesta->respuesta = "Solo Administradores";
 					}
-				}		          
+				}*/		          
 			}    
 			else
 			{
